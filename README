@@ -1,0 +1,4 @@
+DROP Nereus - developed my James Coxon M6JCX (jacoxon@googlemail.com)
+Sleep code from http://www.arduino.cc/playground/Learning/arduinoSleepCode
+Lots of help from Phil Heron (fsphil)
+Adapted NewSoftSerial lib - increased rx buffer to 128 rather than 64 to allow for the long $PUBX responses 
