@@ -2,8 +2,7 @@
 # Written for the Nokia 6110 Navigator (with a slightly broken screen!)
 # Aim is to have it turn on GPS, get a position, turn off the GPS and then send it by SMS
 
-import sysinfo, positioning, e32, time
-#import messaging
+import sysinfo, positioning, e32, time, messaging
 
 
 #Functions
@@ -75,8 +74,7 @@ while True:
 		#Get battery data
 		battery = sysinfo.battery()
 		#Get signal strength
-		#signal = sysinfo.signal_dbm()
-		signal = 0
+		signal = sysinfo.signal_dbm()
 	
 		#Get time
 		user_time = time.time()
@@ -84,11 +82,13 @@ while True:
 		#Print data
 		print user_time, battery, signal
 		
-		telem_string = "%d,%s,%s,%s,%d" % (user_time, gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed'], battery)
+		telem_string = "%d,%f,%f,%.2f,%d,%d" % (user_time, gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed'], gps_data['course']['heading'], battery)
 		
 		print telem_string
 		
+		messaging.sms_send('+447748628528', telem_string,'8bit',cb)
+		
 		print "Sleeping"
-		e32.ao_sleep(21600)
+		e32.ao_sleep(300)
 	
 	e32.ao_sleep(10)
