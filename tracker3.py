@@ -3,15 +3,17 @@
 # Aim is to have it turn on GPS, get a position, turn off the GPS and then send it by SMS
 
 import sysinfo, positioning, e32, time
+#import messaging
 
-global gpson_off = 0
+
 #Functions
 
 def initialize_gps():
 	'''This function initializes the GPS. The select_module(module_id) can be used to select the GPS module in this function. 
 	In this case we are using the default GPS (integrated GPS) hence we do not need to select it.'''
-	Print "Intializing GPS"
+	print "Intializing GPS"
 	global gps_data
+	global gpson
 	#Intitialize the global dictionary with some initial dummy value (0.0 in this case)
 	gps_data = {
 	'satellites': {'horizontal_dop': 0.0, 'used_satellites': 0, 'vertical_dop': 0.0, 'time': 0.0,'satellites': 0, 'time_dop':0.0}, 
@@ -25,15 +27,22 @@ def initialize_gps():
 		positioning.position(course=1,satellites=1,callback=cb_gps, interval=1000000,partial=0)
 		# Sleep for 3 seconds for the intitial fix
 		e32.ao_sleep(3)
-		gpson_off = 1
+		gpson = 1
 	except:
 		print "Problem with GPS"
 		
 def cb_gps(event):
 	global gps_data
 	gps_data = event
+	
+#def cb(state): 
+#	if state==messaging.ESent: 
+#		print "**Message was sent**" 
+#	if state==messaging.ESendFailed: 
+#		print "**Something went wrong**" 
 
 def stop_gps():
+	global gpson
 	'''Function to stop the GPS'''
 	try:
 		positioning.stop_position()
@@ -44,18 +53,21 @@ def stop_gps():
 
 
 #Main Loop
+global gpson
+gpson = 0
+
 print "Starting Tracker3 program"
 
 while True:
 	
-	if (gpson_off == 0)
+	if (gpson == 0):
 		#initialize GPS
 		initialize_gps()
 	
 	sats = gps_data['satellites']['used_satellites'] 
 	print sats
 	
-	if ( sats < 3)
+	if ( sats > 3):
 		print gps_data['satellites']['used_satellites'], gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed']
 	
 		#stop GPS
@@ -71,6 +83,9 @@ while True:
 	
 		#Print data
 		print user_time, battery, signal
+		
+		
+		#messaging.sms_send("1234567", "Hello from PyS60!", ’7bit’, cb)
 		
 		print "Sleeping"
 		e32.ao_sleep(21600)
