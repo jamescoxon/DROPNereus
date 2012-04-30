@@ -23,9 +23,9 @@ def initialize_gps():
 		# Set requesters - it is mandatory to set at least one
 		positioning.set_requestors([{"type":"service","format":"application","data":"gps_app"}])
 		# Request for a fix every 0.5 seconds
-		positioning.position(course=1,satellites=1,callback=cb_gps, interval=1000000,partial=0)
-		# Sleep for 3 seconds for the intitial fix
-		e32.ao_sleep(3)
+		positioning.position(course=1,satellites=1,callback=cb_gps, interval=1000000,partial=1)
+		# Sleep for 30 seconds for the intitial fix
+		e32.ao_sleep(30)
 		gpson = 1
 	except:
 		print "Problem with GPS"
@@ -55,6 +55,8 @@ def stop_gps():
 global gpson
 gpson = 0
 
+old_lat = 0.0
+
 print "Starting Tracker3 program"
 
 while True:
@@ -64,13 +66,14 @@ while True:
 		initialize_gps()
 	
 	sats = gps_data['satellites']['used_satellites'] 
-	print sats
+	print sats, gpson, gps_data['position']['latitude']
 	
-	if ( sats > 3):
+	if ((sats > 3) and (gps_data['position']['latitude'] != old_lat)):
 		print gps_data['satellites']['used_satellites'], gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed']
 	
 		#stop GPS
-		stop_gps()
+		#stop_gps()
+		old_lat = gps_data['position']['latitude']
 		#Get battery data
 		battery = sysinfo.battery()
 		#Get signal strength
@@ -82,11 +85,11 @@ while True:
 		#Print data
 		print user_time, battery, signal
 		
-		telem_string = "%d,%f,%f,%.2f,%d,%d" % (user_time, gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed'], gps_data['course']['heading'], battery)
+		telem_string = "%d,%f,%f,%.2f,%d,%d,%d" % (user_time, gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed'], gps_data['course']['heading'], signal, battery)
 		
 		print telem_string
 		
-		messaging.sms_send('+447748628528', telem_string,'8bit',cb)
+		messaging.sms_send('12345678', telem_string,'8bit',cb)
 		
 		print "Sleeping"
 		e32.ao_sleep(300)
