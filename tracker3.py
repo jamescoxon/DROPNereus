@@ -35,11 +35,11 @@ def cb_gps(event):
 	global gps_data
 	gps_data = event
 	
-#def cb(state): 
-#	if state==messaging.ESent: 
-#		print "**Message was sent**" 
-#	if state==messaging.ESendFailed: 
-#		print "**Something went wrong**" 
+def cb(state): 
+	if state==messaging.ESent: 
+		print "**Message was sent**" 
+	if state==messaging.ESendFailed: 
+		print "**Something went wrong**" 
 
 def stop_gps():
 	global gpson
@@ -84,8 +84,9 @@ while True:
 		#Print data
 		print user_time, battery, signal
 		
+		telem_string = "%d,%s,%s,%s,%d" % (user_time, gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed'], battery)
 		
-		#messaging.sms_send("1234567", "Hello from PyS60!", ’7bit’, cb)
+		print telem_string
 		
 		print "Sleeping"
 		e32.ao_sleep(21600)
