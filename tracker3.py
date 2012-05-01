@@ -54,7 +54,8 @@ def stop_gps():
 #Main Loop
 global gpson
 gpson = 0
-
+loop_number = 0
+count = 0
 old_lat = 0.0
 
 print "Starting Tracker3 program"
@@ -81,17 +82,25 @@ while True:
 	
 		#Get time
 		user_time = time.time()
-	
-		#Print data
-		print user_time, battery, signal
 		
-		telem_string = "%d,%f,%f,%.2f,%d,%d,%d" % (user_time, gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed'], gps_data['course']['heading'], signal, battery)
+		count = count + 1
+		
+		#Print data
+		telem_string = "%d,%d,%f,%f,%.2f,%d,%d,%d" % (count, user_time, gps_data['position']['latitude'], gps_data['position']['longitude'], gps_data['course']['speed'], gps_data['course']['heading'], signal, battery)
 		
 		print telem_string
 		
-		messaging.sms_send('12345678', telem_string,'8bit',cb)
+		messaging.sms_send('+447748628528', telem_string,'8bit',cb)
+		
+		#Reset loop number
+		loop_number = 0
+		
+		#Sleep time, sleep for 5 minutes
 		
 		print "Sleeping"
 		e32.ao_sleep(300)
+	else:
+		loop_number = loop_number + 1
+		print "No GPS Position yet, retry:", loop_number
 	
 	e32.ao_sleep(10)
